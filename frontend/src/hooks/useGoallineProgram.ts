@@ -80,7 +80,7 @@ export function useGoallineProgram() {
 
       const mintInfo = await connection.getAccountInfo(mintPda);
       if (!mintInfo) {
-        await program.methods
+        const txInit = await program.methods
           .initializeMint()
           .accounts({
             mint: mintPda,
@@ -89,6 +89,7 @@ export function useGoallineProgram() {
             systemProgram: SystemProgram.programId,
           })
           .rpc();
+        await connection.confirmTransaction(txInit, "confirmed");
       }
       
       const tx = await program.methods
@@ -118,6 +119,20 @@ export function useGoallineProgram() {
       const marketPda = getMarketPda(fixtureId, marketType);
       const vaultPda = getVaultPda(marketPda);
       const mintPda = getMintPda();
+
+      const mintInfo = await connection.getAccountInfo(mintPda);
+      if (!mintInfo) {
+        const txInit = await program.methods
+          .initializeMint()
+          .accounts({
+            mint: mintPda,
+            authority: publicKey,
+            tokenProgram: TOKEN_PROGRAM_ID,
+            systemProgram: SystemProgram.programId,
+          })
+          .rpc();
+        await connection.confirmTransaction(txInit, "confirmed");
+      }
 
       const tx = await program.methods
         .createMarket(new anchor.BN(fixtureId), marketType, new anchor.BN(closesAtUnix))
