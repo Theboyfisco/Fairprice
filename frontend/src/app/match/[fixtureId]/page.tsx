@@ -6,6 +6,7 @@ import { Fixture, TeamLogo } from "@/components/MatchCard";
 import BetModal from "@/components/BetModal";
 import SettlementPanel from "@/components/SettlementPanel";
 import LiveEventLog from "@/components/LiveEventLog";
+import { useSSEStream } from "@/hooks/useSSEStream";
 import LiquidityPanel from "@/components/LiquidityPanel";
 import MarketLifecycleTimeline from "@/components/MarketLifecycleTimeline";
 import TechnicalPanel from "@/components/TechnicalPanel";
@@ -121,35 +122,35 @@ export default function MatchDetail() {
     }
   };
 
+  const { lastEvent } = useSSEStream();
+
   useEffect(() => {
     fetchData();
-    const stream = new EventSource("/api/stream");
-    stream.onmessage = (event) => {
-      try {
-        const update = JSON.parse(event.data);
-        if (update?.fixtureId === fixtureId) {
-          setFixture((prev) => {
-            if (!prev) return null;
-            const scoreChanged =
-              (update.homeScore !== undefined && update.homeScore !== prev.homeScore) ||
-              (update.awayScore !== undefined && update.awayScore !== prev.awayScore);
-            if (scoreChanged) {
-              setScoreFlash(true);
-              setTimeout(() => setScoreFlash(false), 900);
-            }
-            return {
-              ...prev,
-              homeScore: update.homeScore ?? prev.homeScore,
-              awayScore: update.awayScore ?? prev.awayScore,
-              gamePhase: update.gamePhase ?? prev.gamePhase,
-            };
-          });
-        }
-      } catch {}
-    };
-    stream.onerror = () => stream.close();
-    return () => stream.close();
   }, [fixtureId, connected]);
+
+  useEffect(() => {
+    if (lastEvent?.parsed) {
+      const update = lastEvent.parsed;
+      if (update?.fixtureId === fixtureId) {
+        setFixture((prev) => {
+          if (!prev) return null;
+          const scoreChanged =
+            (update.homeScore !== undefined && update.homeScore !== prev.homeScore) ||
+            (update.awayScore !== undefined && update.awayScore !== prev.awayScore);
+          if (scoreChanged) {
+            setScoreFlash(true);
+            setTimeout(() => setScoreFlash(false), 900);
+          }
+          return {
+            ...prev,
+            homeScore: update.homeScore ?? prev.homeScore,
+            awayScore: update.awayScore ?? prev.awayScore,
+            gamePhase: update.gamePhase ?? prev.gamePhase,
+          };
+        });
+      }
+    }
+  }, [lastEvent, fixtureId]);
 
   const handleOpenBet = (market: string, outcome: string, lineOdds: number, typeByte: number) => {
     setSelectedMarket(market);
@@ -358,6 +359,7 @@ export default function MatchDetail() {
                       key={o.label}
                       onClick={() => handleOpenBet("Match Result", o.outcome, o.value, o.type)}
                       disabled={!isUpcoming}
+                      title={!isUpcoming ? "Betting is closed — match has started or finished" : ""}
                       className="odds-chip"
                     >
                       <span className="text-[10px] text-gray-500 font-bold">{o.label}</span>
@@ -390,6 +392,7 @@ export default function MatchDetail() {
                       key={o.label}
                       onClick={() => handleOpenBet("Over/Under 2.5", o.outcome, o.value, o.type)}
                       disabled={!isUpcoming}
+                      title={!isUpcoming ? "Betting is closed — match has started or finished" : ""}
                       className="odds-chip"
                     >
                       <span className="text-[10px] text-gray-500 font-bold">{o.label}</span>
@@ -422,6 +425,7 @@ export default function MatchDetail() {
                       key={o.label}
                       onClick={() => handleOpenBet("Both Teams to Score", o.outcome, o.value, o.type)}
                       disabled={!isUpcoming}
+                      title={!isUpcoming ? "Betting is closed — match has started or finished" : ""}
                       className="odds-chip"
                     >
                       <span className="text-[10px] text-gray-500 font-bold">{o.label}</span>

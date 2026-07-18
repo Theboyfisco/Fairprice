@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import MatchCard, { Fixture } from "@/components/MatchCard";
 import LiveFeedPanel from "@/components/LiveFeedPanel";
+import { useSSEStream } from "@/hooks/useSSEStream";
 import { Loader2, RefreshCw, Zap, Shield, TrendingUp, ArrowRight } from "lucide-react";
 
 // Animated counter component
@@ -111,32 +112,31 @@ export default function Home() {
     }
   };
 
+  const { lastEvent } = useSSEStream();
+
   useEffect(() => {
     fetchFixtures();
-
-    const stream = new EventSource("/api/stream");
-    stream.onmessage = (event) => {
-      try {
-        const update = JSON.parse(event.data);
-        if (update?.fixtureId) {
-          setFixtures((prev) =>
-            prev.map((f) =>
-              f.fixtureId === update.fixtureId
-                ? {
-                    ...f,
-                    homeScore: update.homeScore ?? f.homeScore,
-                    awayScore: update.awayScore ?? f.awayScore,
-                    gamePhase: update.gamePhase ?? f.gamePhase,
-                  }
-                : f
-            )
-          );
-        }
-      } catch {}
-    };
-    stream.onerror = () => stream.close();
-    return () => stream.close();
   }, []);
+
+  useEffect(() => {
+    if (lastEvent?.parsed) {
+      const update = lastEvent.parsed;
+      if (update?.fixtureId) {
+        setFixtures((prev) =>
+          prev.map((f) =>
+            f.fixtureId === update.fixtureId
+              ? {
+                  ...f,
+                  homeScore: update.homeScore ?? f.homeScore,
+                  awayScore: update.awayScore ?? f.awayScore,
+                  gamePhase: update.gamePhase ?? f.gamePhase,
+                }
+              : f
+          )
+        );
+      }
+    }
+  }, [lastEvent]);
 
   const filteredFixtures = filter === "ALL"
     ? fixtures
@@ -357,13 +357,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Inline marquee keyframes */}
-      <style jsx global>{`
-        @keyframes marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-      `}</style>
+
     </div>
   );
 }

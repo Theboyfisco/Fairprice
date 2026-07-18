@@ -1,3 +1,10 @@
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "TxLINE Integration Feedback | GoalLine",
+  description: "GoalLine integration feedback and notes on the TxLINE API for the Colosseum hackathon.",
+};
+
 const ENDPOINTS = [
   ["Fixtures", "GET /api/fixtures/snapshot", "Seeds the match dashboard and demo mode."],
   ["Scores", "SSE /api/scores/stream", "Powers score ticker, match cards, and keeper simulation."],

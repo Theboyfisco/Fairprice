@@ -40,10 +40,10 @@ export default function RootLayout({
               <div className="flex items-center gap-4">
                 <span className="flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-                  Devnet · Program: 7Ao2A1…gXm8
+                  Devnet · Program: {process.env.NEXT_PUBLIC_PROGRAM_ID ? `${process.env.NEXT_PUBLIC_PROGRAM_ID.slice(0, 6)}…${process.env.NEXT_PUBLIC_PROGRAM_ID.slice(-4)}` : "7Ao2A1…gXm8"}
                 </span>
                 <a
-                  href="https://github.com"
+                  href="https://github.com/Theboyfisco/TXcool-Prediction-Markets-and-Settlement"
                   target="_blank"
                   rel="noreferrer"
                   className="hover:text-gray-400 transition-colors"

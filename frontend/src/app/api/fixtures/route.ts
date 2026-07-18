@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { txlineClient, withAuth } from "@/lib/txline-client";
 
 export const dynamic = "force-dynamic";
 
@@ -90,24 +91,9 @@ export async function GET() {
     return NextResponse.json(mergeDemoFixtures([]));
   }
 
-  // Correct working endpoint discovered from API probing
-  const FIXTURES_URL = "https://txline-dev.txodds.com/api/fixtures/snapshot";
-
   try {
-    const res = await fetch(FIXTURES_URL, {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-        "X-Api-Token": apiToken,
-      },
-      signal: AbortSignal.timeout(1500),
-      next: { revalidate: 30 }, // Cache for 30s
-    });
-
-    if (!res.ok) {
-      throw new Error(`TxLINE fixtures/snapshot returned ${res.status}`);
-    }
-
-    const data: any[] = await res.json();
+    const res = await txlineClient.get("/fixtures/snapshot", withAuth(jwt, apiToken));
+    const data: any[] = res.data;
 
     // Filter to World Cup (CompetitionId=72) and upcoming matches
     const worldCupFixtures = data.filter((f) => f.CompetitionId === 72);

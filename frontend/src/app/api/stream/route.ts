@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { txlineClient, withAuth } from "@/lib/txline-client";
 
 export const dynamic = "force-dynamic";
 
@@ -61,18 +62,10 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  const STREAM_URL = "https://txline-dev.txodds.com/api/scores/stream";
-
   let fallbackTimer: ReturnType<typeof setInterval> | null = null;
 
   const responseStream = new ReadableStream({
     async start(controller) {
-      const headers = {
-        Authorization: `Bearer ${jwt}`,
-        "X-Api-Token": apiToken,
-        Accept: "text/event-stream",
-      };
-
       const safeEnqueue = (chunk: Uint8Array) => {
         try {
           controller.enqueue(chunk);
@@ -87,27 +80,32 @@ export async function GET(request: NextRequest) {
         const streamTimeout = setTimeout(() => streamController.abort(), 1500);
         request.signal.addEventListener("abort", () => streamController.abort(), { once: true });
 
-        const response = await fetch(STREAM_URL, {
-          headers,
+        const response = await txlineClient.get("/scores/stream", {
+          ...withAuth(jwt, apiToken),
+          responseType: "stream",
           signal: streamController.signal,
+          headers: {
+            ...withAuth(jwt, apiToken).headers,
+            Accept: "text/event-stream",
+          }
         });
         clearTimeout(streamTimeout);
 
-        if (!response.ok || !response.body) {
-          throw new Error(`TxLINE Stream HTTP Error: ${response.status}`);
-        }
+        const stream = response.data;
+        
+        stream.on("data", (chunk: Buffer) => {
+          if (request.signal.aborted) return;
+          safeEnqueue(new Uint8Array(chunk));
+        });
+        
+        stream.on("end", () => {
+          try { controller.close(); } catch {}
+        });
+        
+        stream.on("error", () => {
+          try { controller.close(); } catch {}
+        });
 
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-
-        while (true) {
-          if (request.signal.aborted) break;
-          const { done, value } = await reader.read();
-          if (done) break;
-          safeEnqueue(new TextEncoder().encode(decoder.decode(value)));
-        }
-
-        try { controller.close(); } catch { /* already closed */ }
       } catch (err: any) {
         if (!hasLoggedStreamFallback) {
           console.info("TxLINE stream unavailable; using demo SSE stream.", err instanceof Error ? err.message : err);

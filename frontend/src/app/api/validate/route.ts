@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { txlineClient, withAuth } from "@/lib/txline-client";
 
 export const dynamic = "force-dynamic";
 
@@ -61,21 +62,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(customMock);
   }
 
-  const VALIDATE_URL = `https://txline-dev.txodds.com/api/scores/stat-validation?fixtureId=${fixtureId}&seq=${seq}&statKey=${statKey}`;
-
   try {
-    const res = await fetch(VALIDATE_URL, {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-        "X-Api-Token": apiToken,
-      },
-      signal: AbortSignal.timeout(1500),
-      next: { revalidate: 0 },
-    });
-
-    if (!res.ok) throw new Error("TxLINE validation API returned status: " + res.status);
-
-    const data = await res.json();
+    const res = await txlineClient.get(`/scores/stat-validation?fixtureId=${fixtureId}&seq=${seq}&statKey=${statKey}`, withAuth(jwt, apiToken));
+    const data = res.data;
     return NextResponse.json(data);
   } catch (err) {
     if (!hasLoggedValidationFallback) {

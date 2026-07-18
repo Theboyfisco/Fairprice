@@ -18,7 +18,7 @@ const WalletProvider = SolanaWalletProvider as unknown as FC<{ wallets: any[]; a
 const WalletModalProvider = SolanaWalletModalProvider as unknown as FC<{ children: React.ReactNode }>;
 
 // Import styles
-require("@solana/wallet-adapter-react-ui/styles.css");
+import "@solana/wallet-adapter-react-ui/styles.css";
 
 // Define Anchor Context type
 interface AnchorContextType {

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { txlineClient, withAuth } from "@/lib/txline-client";
 
 export const dynamic = "force-dynamic";
 
@@ -33,21 +34,9 @@ export async function GET(
     return NextResponse.json(MOCK_ODDS[fixtureId] || DEFAULT_ODDS);
   }
 
-  const ODDS_SNAPSHOT_URL = `https://txline-dev.txodds.com/api/odds/snapshot/${fixtureId}`;
-
   try {
-    const res = await fetch(ODDS_SNAPSHOT_URL, {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-        "X-Api-Token": apiToken,
-      },
-      signal: AbortSignal.timeout(1500),
-      next: { revalidate: 30 },
-    });
-
-    if (!res.ok) throw new Error("TxLINE odds snapshot returned status: " + res.status);
-
-    const data = await res.json();
+    const res = await txlineClient.get(`/odds/snapshot/${fixtureId}`, withAuth(jwt, apiToken));
+    const data = res.data;
     
     // Normalize data if it has a different shape
     const normalized = {

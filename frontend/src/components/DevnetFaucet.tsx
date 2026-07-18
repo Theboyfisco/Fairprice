@@ -45,7 +45,7 @@ export default function DevnetFaucet() {
 
       {error && (
         <div className="absolute right-0 top-12 bg-red-500/95 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap shadow-lg border border-red-400 z-50">
-          ⚠ {error.substring(0, 40)}...
+          ⚠ {error.length > 40 ? error.substring(0, 40) + "..." : error}
         </div>
       )}
     </div>

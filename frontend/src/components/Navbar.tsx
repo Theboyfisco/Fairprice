@@ -6,41 +6,24 @@ import DevnetFaucet from "./DevnetFaucet";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useState, useEffect } from "react";
 import { Activity, Zap } from "lucide-react";
+import { useSSEStream } from "@/hooks/useSSEStream";
 
 export default function Navbar() {
   const { connected } = useWallet();
-  const [sseConnected, setSseConnected] = useState(false);
   const [eventCount, setEventCount] = useState(0);
 
-  // Track TxLINE SSE connection health
+  const { connected: sseConnected, lastEvent } = useSSEStream();
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
-    let retryTimer: ReturnType<typeof setTimeout>;
-    let es: EventSource;
-
-    const connect = () => {
-      es = new EventSource("/api/stream");
-
-      es.onopen = () => setSseConnected(true);
-
-      es.onmessage = () => {
-        setSseConnected(true);
-        setEventCount((n) => n + 1);
-      };
-
-      es.onerror = () => {
-        setSseConnected(false);
-        es.close();
-        retryTimer = setTimeout(connect, 5000);
-      };
-    };
-
-    connect();
-
-    return () => {
-      es?.close();
-      clearTimeout(retryTimer);
-    };
+    setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (lastEvent) {
+      setEventCount((n) => n + 1);
+    }
+  }, [lastEvent]);
 
   return (
     <>
@@ -72,7 +55,7 @@ export default function Navbar() {
               Judge Demo
             </Link>
             <Link href="/receipt/demo" className="text-xs font-bold text-gray-400 hover:text-white transition-colors">
-              Receipt Archive
+              Demo Receipt
             </Link>
             <Link href="/txline-feedback" className="text-xs font-bold text-gray-400 hover:text-white transition-colors">
               TxLINE Notes
@@ -108,9 +91,9 @@ export default function Navbar() {
           </div>
 
           {/* Right: Wallet */}
-          <div className="flex items-center gap-3 shrink-0">
-            {connected && <DevnetFaucet />}
-            <WalletMultiButton />
+          <div className="flex items-center gap-3 shrink-0 min-w-[150px] justify-end">
+            {mounted && connected && <DevnetFaucet />}
+            {mounted ? <WalletMultiButton /> : <div className="h-[48px] w-[150px] bg-white/5 rounded-xl animate-pulse" />}
           </div>
         </div>
       </nav>

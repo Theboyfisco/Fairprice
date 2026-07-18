@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Activity, ChevronRight, Wifi, WifiOff, X } from "lucide-react";
+import { useSSEStream } from "@/hooks/useSSEStream";
 
 interface FeedEvent {
   id: string;
@@ -22,80 +23,59 @@ interface LiveFeedPanelProps {
 
 export default function LiveFeedPanel({ compact = false }: LiveFeedPanelProps) {
   const [events, setEvents] = useState<FeedEvent[]>([]);
-  const [connected, setConnected] = useState(false);
+  const { connected, lastEvent } = useSSEStream();
   const [collapsed, setCollapsed] = useState(false);
   const logRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let es: EventSource;
-    let retryTimer: ReturnType<typeof setTimeout>;
+    if (connected && events.length === 0) {
+      setEvents((prev) => [
+        {
+          id: `connect-${Date.now()}`,
+          type: "connect",
+          timestamp: new Date(),
+        },
+        ...prev.slice(0, 49),
+      ]);
+    }
+  }, [connected, events.length]);
 
-    const connect = () => {
-      es = new EventSource("/api/stream");
+  useEffect(() => {
+    if (!lastEvent) return;
 
-      es.onopen = () => {
-        setConnected(true);
+    if (lastEvent.parsed) {
+      const data = lastEvent.parsed;
+      const newEvent: FeedEvent = {
+        id: `${Date.now()}-${Math.random()}`,
+        fixtureId: data.fixtureId,
+        homeTeam: data.homeTeam,
+        awayTeam: data.awayTeam,
+        homeScore: data.homeScore,
+        awayScore: data.awayScore,
+        gamePhase: data.gamePhase,
+        type: data.gamePhase ? "phase" : "score",
+        timestamp: new Date(),
+        raw: lastEvent.raw,
+      };
+      if (data.homeScore !== undefined || data.awayScore !== undefined) {
+        newEvent.type = "score";
+      }
+      setEvents((prev) => [newEvent, ...prev.slice(0, 49)]);
+    } else {
+      // heartbeat or non-JSON
+      if (!lastEvent.raw.startsWith("{")) {
         setEvents((prev) => [
           {
-            id: `connect-${Date.now()}`,
-            type: "connect",
+            id: `hb-${Date.now()}`,
+            type: "heartbeat",
             timestamp: new Date(),
+            raw: lastEvent.raw,
           },
           ...prev.slice(0, 49),
         ]);
-      };
-
-      es.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          const newEvent: FeedEvent = {
-            id: `${Date.now()}-${Math.random()}`,
-            fixtureId: data.fixtureId,
-            homeTeam: data.homeTeam,
-            awayTeam: data.awayTeam,
-            homeScore: data.homeScore,
-            awayScore: data.awayScore,
-            gamePhase: data.gamePhase,
-            type: data.gamePhase ? "phase" : "score",
-            timestamp: new Date(),
-            raw: event.data,
-          };
-          if (data.homeScore !== undefined || data.awayScore !== undefined) {
-            newEvent.type = "score";
-          }
-          setConnected(true);
-          setEvents((prev) => [newEvent, ...prev.slice(0, 49)]);
-        } catch {
-          // heartbeat or non-JSON
-          setConnected(true);
-          if (!event.data.startsWith("{")) {
-            setEvents((prev) => [
-              {
-                id: `hb-${Date.now()}`,
-                type: "heartbeat",
-                timestamp: new Date(),
-                raw: event.data,
-              },
-              ...prev.slice(0, 49),
-            ]);
-          }
-        }
-      };
-
-      es.onerror = () => {
-        setConnected(false);
-        es.close();
-        retryTimer = setTimeout(connect, 5000);
-      };
-    };
-
-    connect();
-
-    return () => {
-      es?.close();
-      clearTimeout(retryTimer);
-    };
-  }, []);
+      }
+    }
+  }, [lastEvent]);
 
   // Auto-scroll
   useEffect(() => {

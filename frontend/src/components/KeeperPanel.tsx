@@ -71,7 +71,7 @@ export default function KeeperPanel({
   return (
     <div className="glass rounded-2xl p-4 border border-cyan-500/15 space-y-4">
       <div className="flex items-center gap-2">
-        <Bot className="w-4.5 h-4.5 text-cyan-400" />
+        <Bot className="w-5 h-5 text-cyan-400" />
         <h4 className="text-sm font-black text-white">Keeper Simulation</h4>
         {simulating && <Loader2 className="w-3.5 h-3.5 text-cyan-400 animate-spin ml-auto" />}
         {(finished || isSettled) && !simulating && <CheckCircle className="w-3.5 h-3.5 text-green-400 ml-auto" />}

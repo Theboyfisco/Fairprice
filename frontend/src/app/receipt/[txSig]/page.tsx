@@ -192,11 +192,11 @@ export default function ReceiptPage({ params }: { params: { txSig: string } }) {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <Link
-        href="/demo"
+        href={isDemo && !details?.fixtureId ? "/demo" : `/match/${fixtureId}`}
         className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-white transition-colors"
       >
         <ArrowLeft className="w-3.5 h-3.5" />
-        Back to Demo Sandbox
+        {isDemo && !details?.fixtureId ? "Back to Demo Sandbox" : "Back to Match"}
       </Link>
 
       {/* Header */}
@@ -340,18 +340,17 @@ export default function ReceiptPage({ params }: { params: { txSig: string } }) {
 
       {/* Action buttons */}
       <div className="flex flex-col sm:flex-row gap-3">
-        {!isDemo && (
-          <a
-            href={`https://solscan.io/tx/${txSig}?cluster=devnet`}
-            target="_blank"
-            rel="noreferrer"
-            className="btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-bold"
-          >
-            <Zap className="w-4 h-4" />
-            Open Settlement Tx on Solscan
-            <ExternalLink className="w-3.5 h-3.5" />
-          </a>
-        )}
+        <a
+          href={isDemo ? "#" : `https://solscan.io/tx/${txSig}?cluster=devnet`}
+          target={isDemo ? undefined : "_blank"}
+          rel="noreferrer"
+          className="btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-bold"
+          onClick={(e) => { if (isDemo) { e.preventDefault(); alert("This is a simulated settlement. In production, this opens the real transaction on Solscan."); } }}
+        >
+          <Zap className="w-4 h-4" />
+          {isDemo ? "Simulated Tx (Demo)" : "Open Settlement Tx on Solscan"}
+          <ExternalLink className="w-3.5 h-3.5" />
+        </a>
         <a
           href={`https://solscan.io/account/${PROGRAM_ID}?cluster=devnet`}
           target="_blank"

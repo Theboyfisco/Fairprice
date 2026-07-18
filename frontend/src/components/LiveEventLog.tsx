@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useSSEStream } from "@/hooks/useSSEStream";
 
 interface LiveEvent {
   id: string;
@@ -17,45 +18,26 @@ interface LiveEventLogProps {
 
 export default function LiveEventLog({ fixtureId }: LiveEventLogProps) {
   const [events, setEvents] = useState<LiveEvent[]>([]);
-  const [connected, setConnected] = useState(false);
+  const { connected, lastEvent } = useSSEStream();
   const logRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let es: EventSource;
+    if (!lastEvent || !lastEvent.parsed) return;
 
-    const connect = () => {
-      es = new EventSource("/api/stream");
-      es.onopen = () => setConnected(true);
-      es.onerror = () => {
-        setConnected(false);
-        setTimeout(connect, 5000);
-      };
+    const data = lastEvent.parsed;
+    if (data.fixtureId !== fixtureId) return;
 
-      es.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          if (data.fixtureId !== fixtureId) return;
-
-          const isScore = data.homeScore !== undefined || data.awayScore !== undefined;
-          const newEvent: LiveEvent = {
-            id: `${Date.now()}-${Math.random()}`,
-            type: data.gamePhase && !isScore ? "phase" : "score",
-            homeScore: data.homeScore,
-            awayScore: data.awayScore,
-            gamePhase: data.gamePhase,
-            timestamp: new Date(),
-          };
-          setConnected(true);
-          setEvents((prev) => [newEvent, ...prev.slice(0, 19)]);
-        } catch {
-          // heartbeat
-        }
-      };
+    const isScore = data.homeScore !== undefined || data.awayScore !== undefined;
+    const newEvent: LiveEvent = {
+      id: `${Date.now()}-${Math.random()}`,
+      type: data.gamePhase && !isScore ? "phase" : "score",
+      homeScore: data.homeScore,
+      awayScore: data.awayScore,
+      gamePhase: data.gamePhase,
+      timestamp: new Date(),
     };
-
-    connect();
-    return () => es?.close();
-  }, [fixtureId]);
+    setEvents((prev) => [newEvent, ...prev.slice(0, 19)]);
+  }, [lastEvent, fixtureId]);
 
   const iconFor = (ev: LiveEvent) => {
     if (ev.type === "score") return "⚽";
