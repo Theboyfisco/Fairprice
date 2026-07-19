@@ -12,7 +12,7 @@ import {
 import { SystemProgram } from "@solana/web3.js";
 import { useState } from "react";
 
-export function useGoallineProgram() {
+export function useFairPlayProgram() {
   const { program, programId, connection } = useAnchor();
   const { publicKey } = useWallet();
   const [loading, setLoading] = useState(false);

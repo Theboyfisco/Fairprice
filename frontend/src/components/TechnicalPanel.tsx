@@ -65,7 +65,7 @@ function Row({ label, value, link, mono = true }: { label: string; value: string
 function CPICodeBlock({ fixtureId }: { fixtureId: number }) {
   return (
     <div className="rounded-xl border border-white/[0.06] bg-black/50 p-3 font-mono text-[9px] space-y-0.5 overflow-x-auto">
-      <div className="text-gray-600">// GoalLine → TxLINE CPI (Anchor IDL)</div>
+      <div className="text-gray-600">// FairPlay → TxLINE CPI (Anchor IDL)</div>
       <div>
         <span className="text-purple-400">ctx</span>
         <span className="text-gray-400">.accounts.txline_program.</span>
@@ -128,7 +128,7 @@ export default function TechnicalPanel({
       <div className="space-y-0">
         <Row label="Fixture ID" value={String(fixtureId)} mono={false} />
         <Row
-          label="GoalLine Program"
+          label="FairPlay Program"
           value={programId}
           link={`https://solscan.io/account/${programId}?cluster=devnet`}
         />

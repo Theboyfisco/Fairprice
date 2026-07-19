@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useGoallineProgram } from "@/hooks/useGoallineProgram";
+import { useFairPlayProgram } from "@/hooks/useFairPlayProgram";
 import { Coins, Loader2 } from "lucide-react";
 
 export default function DevnetFaucet() {
-  const { requestFaucet, loading } = useGoallineProgram();
+  const { requestFaucet, loading } = useFairPlayProgram();
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

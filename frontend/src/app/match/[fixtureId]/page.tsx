@@ -12,7 +12,7 @@ import MarketLifecycleTimeline from "@/components/MarketLifecycleTimeline";
 import TechnicalPanel from "@/components/TechnicalPanel";
 import KeeperPanel from "@/components/KeeperPanel";
 import ComplianceNotice from "@/components/ComplianceNotice";
-import { useGoallineProgram } from "@/hooks/useGoallineProgram";
+import { useFairPlayProgram } from "@/hooks/useFairPlayProgram";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Loader2, ArrowLeft, ShieldAlert, Clock, FileCheck } from "lucide-react";
 import Link from "next/link";
@@ -64,7 +64,7 @@ export default function MatchDetail() {
   const params = useParams();
   const fixtureId = Number(params.fixtureId);
   const { connected } = useWallet();
-  const { fetchBet, claimWinnings, getMarketPda, getVaultPda, settleMarket } = useGoallineProgram();
+  const { fetchBet, claimWinnings, getMarketPda, getVaultPda, settleMarket } = useFairPlayProgram();
 
   const [fixture, setFixture] = useState<Fixture | null>(null);
   const [odds, setOdds] = useState<Odds | null>(null);

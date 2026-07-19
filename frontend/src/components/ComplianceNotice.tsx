@@ -10,7 +10,7 @@ export default function ComplianceNotice() {
         <div>
           <h4 className="text-xs font-black text-amber-300 uppercase tracking-wider">Devnet Demonstration</h4>
           <p className="text-[11px] text-gray-500 leading-relaxed mt-1">
-            GoalLine is shown as verifiable settlement infrastructure using test tokens on Solana Devnet. It is not configured for real-money wagering or consumer betting.
+            FairPlay is shown as verifiable settlement infrastructure using test tokens on Solana Devnet. It is not configured for real-money wagering or consumer betting.
           </p>
         </div>
       </div>

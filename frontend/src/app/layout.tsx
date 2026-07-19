@@ -4,12 +4,12 @@ import Providers from "@/components/providers/WalletProvider";
 import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
-  title: "GoalLine | Trustless World Cup Prediction Market",
+  title: "FairPlay | Trustless World Cup Prediction Market",
   description:
     "A decentralized prediction market powered by TxLINE real-time data streams and Solana smart contracts. Bet on World Cup outcomes and settle results cryptographically with Merkle proofs.",
   keywords: "Solana, prediction market, World Cup, TxLINE, betting, DeFi, crypto",
   openGraph: {
-    title: "GoalLine — Trustless World Cup Predictions",
+    title: "FairPlay — Trustless World Cup Predictions",
     description: "Bet on World Cup outcomes. Settle results via TxLINE cryptographic proofs anchored on Solana.",
     type: "website",
   },
@@ -33,7 +33,7 @@ export default function RootLayout({
           <footer className="border-t border-white/[0.04] mt-auto py-6 px-4">
             <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-gray-600">
               <div className="flex items-center gap-2">
-                <span className="font-bold text-gray-500">GoalLine</span>
+                <span className="font-bold text-gray-500">FairPlay</span>
                 <span>·</span>
                 <span>Powered by TxLINE + Solana</span>
               </div>

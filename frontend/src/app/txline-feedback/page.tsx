@@ -1,8 +1,8 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "TxLINE Integration Feedback | GoalLine",
-  description: "GoalLine integration feedback and notes on the TxLINE API for the Colosseum hackathon.",
+  title: "TxLINE Integration Feedback | FairPlay",
+  description: "FairPlay integration feedback and notes on the TxLINE API for the Colosseum hackathon.",
 };
 
 const ENDPOINTS = [
@@ -19,7 +19,7 @@ export default function TxlineFeedbackPage() {
         <div className="text-[11px] font-bold uppercase tracking-wider text-green-400 mb-2">Submission Addendum</div>
         <h1 className="text-4xl font-black text-white">TxLINE Integration Feedback</h1>
         <p className="text-gray-500 mt-3 max-w-2xl">
-          GoalLine uses TxLINE as the primary data layer for live scores, odds snapshots, and verifiable stat proofs. This page gives judges the exact integration map and product feedback requested by the track.
+          FairPlay uses TxLINE as the primary data layer for live scores, odds snapshots, and verifiable stat proofs. This page gives judges the exact integration map and product feedback requested by the track.
         </p>
       </div>
 

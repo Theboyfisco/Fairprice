@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useGoallineProgram } from "@/hooks/useGoallineProgram";
+import { useFairPlayProgram } from "@/hooks/useFairPlayProgram";
 import { Loader2, ShieldCheck, CheckCircle, Circle } from "lucide-react";
 import { PublicKey } from "@solana/web3.js";
 import ProofVisualizer from "./ProofVisualizer";
@@ -20,7 +20,7 @@ export default function SettlementPanel({
   marketPda,
   isSettled: initialIsSettled,
 }: SettlementPanelProps) {
-  const { settleMarket } = useGoallineProgram();
+  const { settleMarket } = useFairPlayProgram();
   const [settled, setSettled] = useState(initialIsSettled);
   const [txSig, setTxSig] = useState<string | null>(null);
   const [proofData, setProofData] = useState<any>(null);

@@ -68,7 +68,7 @@ const ARCH_STEPS = [
   },
   {
     icon: Zap,
-    label: "GoalLine CPI",
+    label: "FairPlay CPI",
     detail: "On-chain validate_stat call resolves the market",
     color: "text-green-400",
     bg: "bg-green-500/10 border-green-500/20",
@@ -196,12 +196,12 @@ export default function DemoPage() {
               Judge Demonstration Mode
             </div>
             <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight leading-none">
-              GoalLine
+              FairPlay
               <span className="block gradient-text-green">Sandbox</span>
             </h1>
             <p className="text-sm text-gray-400 max-w-xl leading-relaxed">
               A fully deterministic judge environment. Three curated fixtures demonstrate the complete
-              GoalLine lifecycle — from TxLINE SSE streaming to cryptographic market settlement with
+              FairPlay lifecycle — from TxLINE SSE streaming to cryptographic market settlement with
               Merkle proofs.
             </p>
           </div>

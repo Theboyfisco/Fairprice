@@ -42,7 +42,7 @@ export default function Navbar() {
               <Zap className="w-4 h-4 text-[#050811]" strokeWidth={2.5} />
             </div>
             <span className="font-bold text-[18px] tracking-tight gradient-text-green">
-              GoalLine
+              FairPlay
             </span>
           </Link>
 

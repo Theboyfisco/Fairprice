@@ -180,7 +180,7 @@ export default function ReceiptPage({ params }: { params: { txSig: string } }) {
   const displayTx = isDemo
     ? txSig.startsWith("demo-settle")
       ? txSig
-      : "demo-settlement-4xGoaLLiNE-r3c3ipt"
+      : "demo-settlement-4xFaIrPLay-r3c3ipt"
     : txSig;
 
   const fixtureId = details?.fixtureId ?? "18143852";
@@ -213,7 +213,7 @@ export default function ReceiptPage({ params }: { params: { txSig: string } }) {
               {homeTeam} {homeScore}–{awayScore} {awayTeam}
             </h1>
             <p className="text-sm text-gray-500 mt-2 max-w-lg">
-              Result verified on-chain via TxLINE Merkle stat proof. GoalLine CPI resolves the outcome
+              Result verified on-chain via TxLINE Merkle stat proof. FairPlay CPI resolves the outcome
               trustlessly — no centralized oracle.
             </p>
           </div>
@@ -278,7 +278,7 @@ export default function ReceiptPage({ params }: { params: { txSig: string } }) {
               <VerificationStep
                 step={3}
                 label="CPI call: validate_stat"
-                detail="GoalLine sends a Cross-Program Invocation to the TxLINE program on Solana to finalize the on-chain proof."
+                detail="FairPlay sends a Cross-Program Invocation to the TxLINE program on Solana to finalize the on-chain proof."
                 delay={400}
               />
               <VerificationStep
@@ -326,7 +326,7 @@ export default function ReceiptPage({ params }: { params: { txSig: string } }) {
           <DataRow label="Daily Merkle Root" value={DEMO_ROOT} />
           <DataRow label="Settlement Tx" value={displayTx} link={!isDemo ? `https://solscan.io/tx/${txSig}?cluster=devnet` : undefined} />
           <DataRow
-            label="GoalLine Program"
+            label="FairPlay Program"
             value={PROGRAM_ID}
             link={`https://solscan.io/account/${PROGRAM_ID}?cluster=devnet`}
           />
@@ -357,7 +357,7 @@ export default function ReceiptPage({ params }: { params: { txSig: string } }) {
           rel="noreferrer"
           className="btn-ghost inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm"
         >
-          GoalLine Program
+          FairPlay Program
           <ExternalLink className="w-4 h-4" />
         </a>
         <Link
@@ -377,8 +377,8 @@ export default function ReceiptPage({ params }: { params: { txSig: string } }) {
         </div>
         <p className="text-[11px] text-gray-500 leading-relaxed mt-2">
           This receipt is the cryptographic audit trail for this settlement. It links the TxLINE finalized fixture
-          stat directly to the GoalLine smart contract invocation. The Merkle proof path verifies that the reported
-          statistic was included in TxLINE's signed daily commitment — without trusting GoalLine or any third party.
+          stat directly to the FairPlay smart contract invocation. The Merkle proof path verifies that the reported
+          statistic was included in TxLINE's signed daily commitment — without trusting FairPlay or any third party.
           The{" "}
           <span className="text-green-400 font-mono">validate_stat</span> CPI call on the Solana program confirms
           the proof on-chain. Winnings are only released after this verification passes.

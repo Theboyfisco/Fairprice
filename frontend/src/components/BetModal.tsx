@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useGoallineProgram } from "@/hooks/useGoallineProgram";
+import { useFairPlayProgram } from "@/hooks/useFairPlayProgram";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { X, Loader2, Landmark, CheckCircle, ChevronRight } from "lucide-react";
@@ -30,7 +30,7 @@ export default function BetModal({
   onSuccess,
 }: BetModalProps) {
   const { connected } = useWallet();
-  const { fetchMarket, createMarket, placeBet, getMarketPda } = useGoallineProgram();
+  const { fetchMarket, createMarket, placeBet, getMarketPda } = useFairPlayProgram();
 
   const [amount, setAmount] = useState("50");
   const [step, setStep] = useState<Step>("review");

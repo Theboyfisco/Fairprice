@@ -113,7 +113,7 @@ export default function KeeperPanel({
         <div className="rounded-xl border border-white/10 bg-black/60 p-3 font-mono text-[9px] text-gray-300 space-y-1 max-h-[140px] overflow-y-auto">
           <div className="flex items-center gap-1.5 text-cyan-400 border-b border-white/[0.06] pb-1.5 mb-1.5">
             <Terminal className="w-3 h-3" />
-            <span>KEEPER@GOALLINE-DAEMON:~</span>
+            <span>KEEPER@FAIRPLAY-DAEMON:~</span>
           </div>
           {logs.map((log, i) => (
             <div key={i} className={log.includes("[ERROR]") ? "text-red-400" : log.includes("confirmed") ? "text-green-400" : ""}>
