@@ -149,89 +149,252 @@ export default function Home() {
       {/* Live ticker */}
       <LiveTicker fixtures={fixtures} />
 
-      {/* Hero Section */}
-      <div className="relative py-10 sm:py-24 overflow-hidden">
-        {/* Background glow orbs */}
-        <div className="absolute -top-32 -left-32 w-96 h-96 bg-green-500/5 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -top-20 right-0 w-80 h-80 bg-purple-500/5 rounded-full blur-3xl pointer-events-none" />
+      {/* ═══════════════════════════════════════════════
+           HERO — Full-screen drama
+      ═══════════════════════════════════════════════ */}
+      <div className="relative min-h-[88vh] flex flex-col justify-center overflow-hidden -mx-6 px-6 sm:-mx-12 sm:px-12 lg:-mx-24 lg:px-24">
 
-        <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div className="max-w-3xl animate-fade-in-up">
-            {/* Tag */}
-            <div className="inline-flex items-center gap-2 glass-sm border border-white/[0.06] rounded-full px-3 py-1.5 mb-6">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-[11px] text-gray-400 font-semibold uppercase tracking-widest">
-                TxLINE × Solana · Superteams 2026
+        {/* ── Aurora background layers ── */}
+        <div className="absolute inset-0 pointer-events-none">
+          {/* Base dark layer */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#040811] via-[#050a14] to-[#050811]" />
+
+          {/* Aurora blob 1 — green */}
+          <div
+            className="absolute animate-aurora"
+            style={{
+              top: '-20%', left: '-10%',
+              width: '70%', height: '80%',
+              background: 'radial-gradient(ellipse, rgba(0,255,135,0.2) 0%, transparent 65%)',
+              filter: 'blur(40px)',
+              animationDuration: '12s',
+            }}
+          />
+          {/* Aurora blob 2 — purple */}
+          <div
+            className="absolute animate-aurora"
+            style={{
+              top: '10%', right: '-15%',
+              width: '65%', height: '75%',
+              background: 'radial-gradient(ellipse, rgba(124,58,237,0.22) 0%, transparent 65%)',
+              filter: 'blur(40px)',
+              animationDuration: '16s',
+              animationDelay: '-5s',
+            }}
+          />
+          {/* Aurora blob 3 — cyan accent */}
+          <div
+            className="absolute animate-aurora"
+            style={{
+              bottom: '-10%', left: '25%',
+              width: '55%', height: '60%',
+              background: 'radial-gradient(ellipse, rgba(34,211,238,0.12) 0%, transparent 65%)',
+              filter: 'blur(50px)',
+              animationDuration: '20s',
+              animationDelay: '-8s',
+            }}
+          />
+
+          {/* Grid overlay */}
+          <div
+            className="absolute inset-0 opacity-[0.025]"
+            style={{
+              backgroundImage: 'linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px)',
+              backgroundSize: '60px 60px',
+            }}
+          />
+        </div>
+
+        {/* ── Main hero content ── */}
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-10 lg:gap-16 items-center py-20 lg:py-0">
+
+          {/* LEFT — Text content */}
+          <div className="space-y-8">
+
+            {/* Badge */}
+            <div className="animate-hero-text stagger-1 inline-flex items-center gap-2.5 rounded-full border border-green-500/20 bg-green-500/5 px-4 py-2 backdrop-blur-sm">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-green-400" />
+              </span>
+              <span className="text-xs font-bold uppercase tracking-widest text-green-400">
+                TxLINE × Solana · World Cup 2026
               </span>
             </div>
 
-            <h1 className="text-4xl sm:text-7xl font-black tracking-tight leading-[1.05] mb-6">
-              Predict the{" "}
-              <span className="gradient-text">World Cup.</span>
-              <br />
-              Settle on{" "}
-              <span className="text-white">Solana.</span>
-            </h1>
+            {/* Headline */}
+            <div className="space-y-0">
+              <h1 className="animate-hero-text stagger-2 text-[clamp(3rem,8vw,7rem)] font-black tracking-[-0.04em] leading-[0.9]">
+                <span className="text-white">Predict</span>{' '}
+                <br className="hidden sm:block" />
+                <span
+                  className="inline-block"
+                  style={{
+                    background: 'linear-gradient(90deg, #00ff87 0%, #22d3ee 45%, #a78bfa 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                    backgroundSize: '200% auto',
+                    animation: 'gradientShift 4s linear infinite',
+                  }}
+                >
+                  the World Cup.{' '}
+                </span>
+                <br />
+                <span className="text-white">Settle on{' '}</span>
+                <span
+                  style={{
+                    background: 'linear-gradient(90deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.4) 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                  }}
+                >Solana.</span>
+              </h1>
+            </div>
 
-            <p className="text-gray-400 text-base sm:text-lg leading-relaxed max-w-2xl mb-8">
-              A trustless prediction market powered by{" "}
-              <span className="text-green-400 font-semibold">TxLINE's real-time data streams</span> and
-              cryptographic Merkle proofs anchored on-chain. No centralized oracles. No trust required.
+            {/* Subheadline */}
+            <p className="animate-hero-text stagger-3 text-gray-400 text-lg sm:text-xl leading-relaxed max-w-xl">
+              Real-time odds, cryptographic proofs, on-chain settlement.{' '}
+              <span className="text-white/80">Powered by TxLINE's live data feed — the same infrastructure used by major betting operators.</span>
             </p>
 
-            {/* CTA buttons */}
-            <div className="flex flex-wrap gap-3 mb-10">
+            {/* CTAs */}
+            <div className="animate-hero-text stagger-4 flex flex-wrap gap-3">
               <Link
-                href={fixtures.length > 0 ? `/match/${fixtures[0]?.fixtureId}` : "#matches"}
-                className="btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-sm"
+                href={fixtures.length > 0 ? `/match/${fixtures[0]?.fixtureId}` : '#matches'}
+                className="group relative inline-flex items-center gap-2.5 rounded-2xl px-7 py-3.5 text-sm font-bold text-black overflow-hidden"
+                style={{ background: 'linear-gradient(135deg, #00ff87, #00d4a8)' }}
               >
+                <span className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
                 <Zap className="w-4 h-4" />
-                Place a Bet
-                <ArrowRight className="w-4 h-4" />
+                Place a Prediction
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
               <a
                 href="#how-it-works"
-                className="btn-ghost inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-sm"
+                className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-7 py-3.5 text-sm font-semibold text-gray-300 backdrop-blur-sm hover:bg-white/10 hover:border-white/20 hover:text-white transition-all"
               >
-                How It Works
+                See How It Works
               </a>
             </div>
 
-            {/* Stats strip */}
-            <div className="flex gap-4 overflow-x-auto sm:flex-wrap pb-2 sm:pb-0 scrollbar-hide">
+            {/* Stat row */}
+            <div className="animate-hero-text stagger-5 grid grid-cols-3 gap-3 max-w-xl pt-2">
               {[
-                { label: "Live Matches", value: liveCount, color: "text-red-400", dot: "bg-red-400" },
-                { label: "Total Fixtures", value: fixtures.length, color: "text-white", dot: "bg-green-400" },
-                { label: "Active Markets", value: fixtures.length * 3, color: "text-purple-400", dot: "bg-purple-400" },
+                { label: 'Live Matches', value: liveCount, suffix: '', color: '#ff4444', icon: '🔴' },
+                { label: 'Fixtures', value: fixtures.length, suffix: '', color: '#00ff87', icon: '🏟️' },
+                { label: 'Markets', value: fixtures.length * 3, suffix: '+', color: '#a78bfa', icon: '📊' },
               ].map((stat) => (
-                <div
-                  key={stat.label}
-                  className="glass-sm rounded-2xl px-5 py-3 flex items-center gap-3 border border-white/[0.05]"
-                >
-                  <span className={`w-1.5 h-1.5 rounded-full ${stat.dot} ${stat.value > 0 && stat.dot === "bg-red-400" ? "animate-pulse" : ""}`} />
-                  <div>
-                    <div className={`text-2xl font-black ${stat.color}`}>
-                      <AnimatedNumber value={stat.value} />
-                    </div>
-                    <div className="text-[10px] text-gray-600 uppercase tracking-wider font-bold">
-                      {stat.label}
-                    </div>
+                <div key={stat.label} className="hero-stat-card text-center">
+                  <div className="text-2xl sm:text-3xl font-black mb-0.5" style={{ color: stat.color }}>
+                    <AnimatedNumber value={stat.value} />{stat.suffix}
                   </div>
+                  <div className="text-[10px] uppercase tracking-wider text-gray-500 font-bold">{stat.label}</div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="relative hidden lg:flex justify-center items-center animate-fade-in-up" style={{ animationDelay: '0.2s', animationFillMode: 'both' }}>
-            <div className="absolute w-full h-[120%] bg-gradient-to-tr from-green-500/10 to-purple-500/10 rounded-full blur-[80px] pointer-events-none" />
-            <img 
-              src="/hero-graphic.png" 
-              alt="Solana TxLINE Prediction Market"
-              className="relative w-full max-w-[480px] object-contain drop-shadow-[0_0_50px_rgba(0,255,135,0.15)] animate-float"
-            />
+          {/* RIGHT — Animated pure-CSS soccer orb visualizer */}
+          <div className="hidden lg:flex justify-center items-center animate-hero-text stagger-6" style={{ minHeight: 400 }}>
+            <div className="relative w-80 h-80 xl:w-96 xl:h-96 flex items-center justify-center">
+
+              {/* Outermost slow orbit ring */}
+              <div
+                className="absolute inset-0 rounded-full border border-green-500/10 animate-orbit"
+                style={{ animationDuration: '20s' }}
+              />
+              {/* Outer orbit ring */}
+              <div
+                className="absolute rounded-full border border-purple-500/15 animate-orbit-reverse"
+                style={{ inset: '16px', animationDuration: '14s' }}
+              />
+
+              {/* Orbiting data dots — green */}
+              <div className="absolute inset-0 animate-orbit" style={{ animationDuration: '8s' }}>
+                <div
+                  className="absolute w-3 h-3 rounded-full bg-green-400 shadow-[0_0_12px_rgba(0,255,135,0.8)]"
+                  style={{ top: '0%', left: '50%', transform: 'translate(-50%,-50%)' }}
+                />
+              </div>
+              <div className="absolute animate-orbit-reverse" style={{ inset: '16px', animationDuration: '11s' }}>
+                <div
+                  className="absolute w-2.5 h-2.5 rounded-full bg-purple-400 shadow-[0_0_10px_rgba(167,139,250,0.8)]"
+                  style={{ bottom: '0%', left: '50%', transform: 'translate(-50%,50%)' }}
+                />
+              </div>
+              <div className="absolute animate-orbit" style={{ inset: '32px', animationDuration: '15s' }}>
+                <div
+                  className="absolute w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]"
+                  style={{ top: '50%', right: '0%', transform: 'translate(50%,-50%)' }}
+                />
+              </div>
+
+              {/* Inner ring */}
+              <div
+                className="absolute rounded-full border border-cyan-500/20 animate-orbit"
+                style={{ inset: '48px', animationDuration: '10s' }}
+              />
+
+              {/* Soccer ball orb — center */}
+              <div
+                className="relative w-44 h-44 xl:w-52 xl:h-52 rounded-full flex items-center justify-center animate-float"
+                style={{ animationDuration: '7s' }}
+              >
+                {/* Glowing halo */}
+                <div
+                  className="absolute inset-0 rounded-full"
+                  style={{
+                    background: 'radial-gradient(circle, rgba(0,255,135,0.2) 0%, rgba(124,58,237,0.1) 50%, transparent 75%)',
+                    filter: 'blur(20px)',
+                    transform: 'scale(1.4)',
+                  }}
+                />
+                {/* Orb surface */}
+                <div
+                  className="absolute inset-0 rounded-full"
+                  style={{
+                    background: 'radial-gradient(circle at 35% 30%, rgba(255,255,255,0.12) 0%, rgba(0,0,0,0) 50%), radial-gradient(circle at 65% 70%, rgba(124,58,237,0.15) 0%, rgba(0,0,0,0) 60%), linear-gradient(135deg, #0d1a2e 0%, #081220 100%)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    boxShadow: '0 0 60px rgba(0,255,135,0.12), 0 0 120px rgba(124,58,237,0.08), inset 0 1px 1px rgba(255,255,255,0.06)',
+                  }}
+                />
+                {/* Soccer ball emoji or SVG */}
+                <span className="relative z-10 text-7xl xl:text-8xl select-none" style={{ filter: 'drop-shadow(0 0 30px rgba(0,255,135,0.4))' }}>
+                  ⚽
+                </span>
+                {/* Scan line */}
+                <div
+                  className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-green-400/60 to-transparent animate-scan overflow-hidden rounded-full"
+                  style={{ pointerEvents: 'none' }}
+                />
+              </div>
+
+              {/* Floating data chips */}
+              <div className="absolute -top-2 right-4 hero-stat-card px-3 py-2 text-[10px] font-mono text-green-400 animate-float" style={{ animationDelay: '-2s', animationDuration: '8s' }}>
+                <div className="flex items-center gap-1.5">
+                  <span className="animate-blink w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
+                  <span>SSE LIVE</span>
+                </div>
+                <div className="text-white/60 mt-0.5">Spain 1–0 ARG</div>
+              </div>
+              <div className="absolute bottom-0 -left-4 hero-stat-card px-3 py-2 text-[10px] font-mono text-purple-400 animate-float" style={{ animationDelay: '-4s', animationDuration: '10s' }}>
+                <div className="text-white/40 text-[9px] uppercase tracking-wider">Merkle Root</div>
+                <div className="mt-0.5 font-bold">0x4a2f…c8e1</div>
+              </div>
+              <div className="absolute top-1/2 -right-6 hero-stat-card px-3 py-2 text-[10px] font-mono text-cyan-400 animate-float" style={{ animationDelay: '-6s', animationDuration: '9s' }}>
+                <div className="text-white/40 text-[9px] uppercase tracking-wider">On-chain</div>
+                <div className="mt-0.5 font-bold text-green-400">✓ Verified</div>
+              </div>
+            </div>
           </div>
         </div>
+
+        {/* ── Bottom gradient fade into content ── */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#050811] to-transparent pointer-events-none" />
       </div>
+
 
       {/* How It Works */}
       <div id="how-it-works" className="py-12 border-t border-white/[0.04]">

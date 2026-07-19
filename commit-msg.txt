@@ -1,0 +1,1 @@
+feat: dramatic hero section redesign with aurora bg, CSS orb visualizer, staggered text
