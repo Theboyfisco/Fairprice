@@ -1,1 +1,0 @@
-feat: polish hero aurora strength and text layout
