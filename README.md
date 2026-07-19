@@ -3,6 +3,7 @@
 > **Superteams × TxLINE Track Submission**  
 > **Network**: Solana Devnet  
 > **Live Demo**:https://t-xcool-prediction-markets-and-sett-red.vercel.app/  
+> **Demo Video**:https://www.loom.com/share/38c090a4ae6340dd8e600aa5cdd3dd11/ 
 
 
 GoalLine is a **permissionless, cryptographically-verifiable prediction market** for the FIFA World Cup 2026. It leverages TxLINE's real-time data streams and Merkle-proof infrastructure to enable users to place USDC bets on match outcomes without relying on a centralized oracle for settlement.
