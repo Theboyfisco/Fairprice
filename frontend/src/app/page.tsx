@@ -152,44 +152,44 @@ export default function Home() {
       {/* ═══════════════════════════════════════════════
            HERO — Full-screen drama
       ═══════════════════════════════════════════════ */}
-      <div className="relative min-h-[88vh] flex flex-col justify-center overflow-hidden -mx-6 px-6 sm:-mx-12 sm:px-12 lg:-mx-24 lg:px-24">
+      <div className="relative flex flex-col justify-center overflow-hidden -mx-6 px-6 sm:-mx-12 sm:px-12 lg:-mx-24 lg:px-24 pb-12">
 
         {/* ── Aurora background layers ── */}
-        <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
           {/* Base dark layer */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#040811] via-[#050a14] to-[#050811]" />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #030810 0%, #060d1a 50%, #040810 100%)' }} />
 
-          {/* Aurora blob 1 — green */}
+          {/* Aurora blob 1 — strong green top-left */}
           <div
             className="absolute animate-aurora"
             style={{
-              top: '-20%', left: '-10%',
-              width: '70%', height: '80%',
-              background: 'radial-gradient(ellipse, rgba(0,255,135,0.2) 0%, transparent 65%)',
-              filter: 'blur(40px)',
+              top: '-30%', left: '-15%',
+              width: '80%', height: '90%',
+              background: 'radial-gradient(ellipse at center, rgba(0,255,135,0.28) 0%, rgba(0,200,100,0.12) 40%, transparent 70%)',
+              filter: 'blur(30px)',
               animationDuration: '12s',
             }}
           />
-          {/* Aurora blob 2 — purple */}
+          {/* Aurora blob 2 — strong purple right */}
           <div
             className="absolute animate-aurora"
             style={{
-              top: '10%', right: '-15%',
-              width: '65%', height: '75%',
-              background: 'radial-gradient(ellipse, rgba(124,58,237,0.22) 0%, transparent 65%)',
-              filter: 'blur(40px)',
+              top: '5%', right: '-20%',
+              width: '70%', height: '80%',
+              background: 'radial-gradient(ellipse at center, rgba(139,92,246,0.3) 0%, rgba(124,58,237,0.15) 40%, transparent 70%)',
+              filter: 'blur(30px)',
               animationDuration: '16s',
               animationDelay: '-5s',
             }}
           />
-          {/* Aurora blob 3 — cyan accent */}
+          {/* Aurora blob 3 — cyan bottom center */}
           <div
             className="absolute animate-aurora"
             style={{
-              bottom: '-10%', left: '25%',
-              width: '55%', height: '60%',
-              background: 'radial-gradient(ellipse, rgba(34,211,238,0.12) 0%, transparent 65%)',
-              filter: 'blur(50px)',
+              bottom: '-15%', left: '20%',
+              width: '60%', height: '60%',
+              background: 'radial-gradient(ellipse at center, rgba(34,211,238,0.18) 0%, transparent 65%)',
+              filter: 'blur(35px)',
               animationDuration: '20s',
               animationDelay: '-8s',
             }}
@@ -206,7 +206,7 @@ export default function Home() {
         </div>
 
         {/* ── Main hero content ── */}
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-10 lg:gap-16 items-center py-20 lg:py-0">
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8 lg:gap-12 items-center pt-20 pb-16">
 
           {/* LEFT — Text content */}
           <div className="space-y-8">
@@ -223,31 +223,28 @@ export default function Home() {
             </div>
 
             {/* Headline */}
-            <div className="space-y-0">
-              <h1 className="animate-hero-text stagger-2 text-[clamp(3rem,8vw,7rem)] font-black tracking-[-0.04em] leading-[0.9]">
-                <span className="text-white">Predict</span>{' '}
-                <br className="hidden sm:block" />
+            <div>
+              <h1 className="animate-hero-text stagger-2 font-black tracking-[-0.04em] leading-[0.88]" style={{ fontSize: 'clamp(3.5rem, 9vw, 8rem)' }}>
+                <span className="text-white">Predict </span>
                 <span
-                  className="inline-block"
                   style={{
-                    background: 'linear-gradient(90deg, #00ff87 0%, #22d3ee 45%, #a78bfa 100%)',
+                    background: 'linear-gradient(90deg, #00ff87 0%, #22d3ee 50%, #a78bfa 100%)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     backgroundClip: 'text',
                     backgroundSize: '200% auto',
                     animation: 'gradientShift 4s linear infinite',
+                    display: 'inline',
                   }}
                 >
-                  the World Cup.{' '}
+                  the World Cup.
                 </span>
                 <br />
-                <span className="text-white">Settle on{' '}</span>
+                <span className="text-white">Settle on </span>
                 <span
                   style={{
-                    background: 'linear-gradient(90deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.4) 100%)',
-                    WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
+                    WebkitTextStroke: '2px rgba(255,255,255,0.2)',
                   }}
                 >Solana.</span>
               </h1>
