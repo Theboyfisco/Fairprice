@@ -45,6 +45,21 @@ export default function LiveFeedPanel({ compact = false }: LiveFeedPanelProps) {
 
     if (lastEvent.parsed) {
       const data = lastEvent.parsed;
+
+      // Handle the server-side "connected" control event
+      if (data.type === "connected") {
+        setEvents((prev) => [
+          {
+            id: `connect-${Date.now()}`,
+            type: "connect",
+            timestamp: new Date(),
+            raw: data.source === "txline-live" ? "txline-live" : "demo",
+          },
+          ...prev.slice(0, 49),
+        ]);
+        return;
+      }
+
       const newEvent: FeedEvent = {
         id: `${Date.now()}-${Math.random()}`,
         fixtureId: data.fixtureId,
@@ -62,8 +77,10 @@ export default function LiveFeedPanel({ compact = false }: LiveFeedPanelProps) {
       }
       setEvents((prev) => [newEvent, ...prev.slice(0, 49)]);
     } else {
-      // heartbeat or non-JSON
-      if (!lastEvent.raw.startsWith("{")) {
+      // heartbeat or non-JSON (SSE comment lines like `: txline-keepalive`)
+      if (lastEvent.raw && !lastEvent.raw.startsWith("{")) {
+        // Skip SSE comment keepalive lines silently — don't pollute the feed
+        if (lastEvent.raw.startsWith(":")) return;
         setEvents((prev) => [
           {
             id: `hb-${Date.now()}`,
@@ -117,11 +134,13 @@ export default function LiveFeedPanel({ compact = false }: LiveFeedPanelProps) {
   const getEventText = (event: FeedEvent) => {
     switch (event.type) {
       case "score":
-        return `Fixture #${event.fixtureId}: ${event.homeScore ?? "?"} – ${event.awayScore ?? "?"}`;
+        return `${event.homeTeam ?? `Fixture #${event.fixtureId}`} ${event.homeScore ?? "?"} – ${event.awayScore ?? "?"} ${event.awayTeam ?? ""}`;
       case "phase":
-        return `Fixture #${event.fixtureId}: ${event.gamePhase}`;
+        return `Fixture #${event.fixtureId}: Phase → ${event.gamePhase}`;
       case "connect":
-        return "Connected to TxLINE SSE stream";
+        return event.raw === "txline-live"
+          ? "✅ Connected to TxLINE Live Stream"
+          : "Connected to SSE stream (demo mode)";
       case "heartbeat":
         return `Heartbeat: ${event.raw?.slice(0, 30) ?? "ping"}`;
       default:

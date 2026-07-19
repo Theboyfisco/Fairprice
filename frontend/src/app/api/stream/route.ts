@@ -1,11 +1,11 @@
 import { NextRequest } from "next/server";
-import { txlineClient, withAuth } from "@/lib/txline-client";
+import https from "https";
 
 export const dynamic = "force-dynamic";
 
 const MOCK_EVENTS = [
+  { fixtureId: 18257739, homeTeam: "Spain", awayTeam: "Argentina", homeScore: 1, awayScore: 0, gamePhase: "LIVE" },
   { fixtureId: 18172379, homeTeam: "USA", awayTeam: "Mexico", homeScore: 2, awayScore: 1, gamePhase: "LIVE" },
-  { fixtureId: 18143853, homeTeam: "England", awayTeam: "Japan", homeScore: 1, awayScore: 1, gamePhase: "HT" },
   { fixtureId: 18143852, homeTeam: "France", awayTeam: "Argentina", homeScore: 3, awayScore: 2, gamePhase: "FT" },
 ];
 
@@ -27,7 +27,6 @@ function createDemoEventStream(signal: AbortSignal) {
         try {
           controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
         } catch {
-          // Controller already closed — stop sending
           if (timer) clearInterval(timer);
           return;
         }
@@ -62,79 +61,148 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  let fallbackTimer: ReturnType<typeof setInterval> | null = null;
-
+  // Use Node's https module directly to avoid undici SSL issues.
+  // This allows rejectUnauthorized: false and avoids the undici
+  // issue where NODE_TLS_REJECT_UNAUTHORIZED has no effect.
   const responseStream = new ReadableStream({
-    async start(controller) {
-      const safeEnqueue = (chunk: Uint8Array) => {
+    start(controller) {
+      const encoder = new TextEncoder();
+
+      const safeEnqueue = (chunk: string) => {
         try {
-          controller.enqueue(chunk);
+          controller.enqueue(encoder.encode(chunk));
         } catch {
-          // Controller closed — clean up timer if any
-          if (fallbackTimer) { clearInterval(fallbackTimer); fallbackTimer = null; }
+          // Controller closed
         }
       };
 
-      try {
-        const streamController = new AbortController();
-        const streamTimeout = setTimeout(() => streamController.abort(), 1500);
-        request.signal.addEventListener("abort", () => streamController.abort(), { once: true });
+      const safeClose = () => {
+        try { controller.close(); } catch { /* already closed */ }
+      };
 
-        const response = await txlineClient.get("/scores/stream", {
-          ...withAuth(jwt, apiToken),
-          responseType: "stream",
-          signal: streamController.signal,
+      const agent = new https.Agent({ rejectUnauthorized: false });
+
+      const req = https.request(
+        {
+          hostname: "txline-dev.txodds.com",
+          path: "/api/scores/stream",
+          method: "GET",
+          agent,
           headers: {
-            ...withAuth(jwt, apiToken).headers,
+            Authorization: `Bearer ${jwt}`,
+            "X-Api-Token": apiToken,
             Accept: "text/event-stream",
-          }
-        });
-        clearTimeout(streamTimeout);
-
-        const stream = response.data;
-        
-        stream.on("data", (chunk: Buffer) => {
-          if (request.signal.aborted) return;
-          safeEnqueue(new Uint8Array(chunk));
-        });
-        
-        stream.on("end", () => {
-          try { controller.close(); } catch {}
-        });
-        
-        stream.on("error", () => {
-          try { controller.close(); } catch {}
-        });
-
-      } catch (err: any) {
-        if (!hasLoggedStreamFallback) {
-          console.info("TxLINE stream unavailable; using demo SSE stream.", err instanceof Error ? err.message : err);
-          hasLoggedStreamFallback = true;
-        }
-        let idx = 0;
-        const encoder = new TextEncoder();
-
-        const sendFallback = () => {
-          if (request.signal.aborted) {
-            if (fallbackTimer) { clearInterval(fallbackTimer); fallbackTimer = null; }
-            try { controller.close(); } catch { /* already closed */ }
+            "Cache-Control": "no-cache",
+          },
+        },
+        (res) => {
+          if (res.statusCode !== 200) {
+            if (!hasLoggedStreamFallback) {
+              console.info(`TxLINE stream returned ${res.statusCode}; falling back to demo.`);
+              hasLoggedStreamFallback = true;
+            }
+            req.destroy();
+            // Start demo fallback
+            let idx = 0;
+            const sendFallback = () => {
+              if (request.signal.aborted) return;
+              const event = { ...MOCK_EVENTS[idx % MOCK_EVENTS.length], ts: Date.now(), source: "demo-fallback" };
+              safeEnqueue(`data: ${JSON.stringify(event)}\n\n`);
+              idx++;
+            };
+            sendFallback();
+            const timer = setInterval(() => {
+              if (request.signal.aborted) { clearInterval(timer); safeClose(); return; }
+              sendFallback();
+            }, 2500);
+            request.signal.addEventListener("abort", () => { clearInterval(timer); safeClose(); });
             return;
           }
-          const event = {
-            ...MOCK_EVENTS[idx % MOCK_EVENTS.length],
-            ts: Date.now(),
-            source: "demo-fallback",
-          };
-          safeEnqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
-          idx += 1;
-        };
 
+          // ✅ Successfully proxying TxLINE live stream.
+          // Send an immediate connect event so the browser UI knows we're live.
+          const connectPayload = JSON.stringify({
+            type: "connected",
+            source: "txline-live",
+            ts: Date.now(),
+            message: "Connected to TxLINE SSE stream",
+          });
+          safeEnqueue(`data: ${connectPayload}\n\n`);
+
+          // Send a heartbeat comment every 25s to keep proxies/browsers alive.
+          let heartbeatTimer: ReturnType<typeof setInterval> | null = setInterval(() => {
+            if (request.signal.aborted) {
+              if (heartbeatTimer) { clearInterval(heartbeatTimer); heartbeatTimer = null; }
+              return;
+            }
+            safeEnqueue(": txline-keepalive\n\n");
+          }, 25000);
+          request.signal.addEventListener("abort", () => {
+            if (heartbeatTimer) { clearInterval(heartbeatTimer); heartbeatTimer = null; }
+          });
+
+          // Proxy the live TxLINE SSE stream.
+          // Buffer partial SSE lines across chunks.
+          let buffer = "";
+          res.on("data", (chunk: Buffer) => {
+            if (request.signal.aborted) { req.destroy(); return; }
+
+            buffer += chunk.toString();
+
+            // SSE events are delimited by double newlines.
+            // Forward complete events immediately; hold partial lines in buffer.
+            const parts = buffer.split("\n\n");
+            buffer = parts.pop() ?? ""; // keep last (possibly incomplete) part
+
+            for (const part of parts) {
+              if (part.trim()) {
+                // Re-emit as a proper SSE event
+                safeEnqueue(part + "\n\n");
+              }
+            }
+          });
+
+          res.on("end", () => {
+            if (heartbeatTimer) { clearInterval(heartbeatTimer); heartbeatTimer = null; }
+            if (buffer.trim()) safeEnqueue(buffer + "\n\n");
+            safeClose();
+          });
+
+          res.on("error", () => {
+            if (heartbeatTimer) { clearInterval(heartbeatTimer); heartbeatTimer = null; }
+            safeClose();
+          });
+        }
+      );
+
+      req.on("error", (err) => {
+        if (!hasLoggedStreamFallback) {
+          console.info("TxLINE stream connection error; using demo SSE stream.", err.message);
+          hasLoggedStreamFallback = true;
+        }
+        // Fall back to demo on error
+        let idx = 0;
+        const sendFallback = () => {
+          if (request.signal.aborted) return;
+          const event = { ...MOCK_EVENTS[idx % MOCK_EVENTS.length], ts: Date.now(), source: "demo-fallback" };
+          safeEnqueue(`data: ${JSON.stringify(event)}\n\n`);
+          idx++;
+        };
         sendFallback();
-        fallbackTimer = setInterval(sendFallback, 2500);
-      }
-    },
-    cancel() {
-      if (fallbackTimer) { clearInterval(fallbackTimer); fallbackTimer = null; }
+        const timer = setInterval(() => {
+          if (request.signal.aborted) { clearInterval(timer); safeClose(); return; }
+          sendFallback();
+        }, 2500);
+        request.signal.addEventListener("abort", () => { clearInterval(timer); safeClose(); });
+      });
+
+      // Abort the upstream request when the client disconnects
+      request.signal.addEventListener("abort", () => {
+        req.destroy();
+        safeClose();
+      });
+
+      req.end();
     },
   });
 
